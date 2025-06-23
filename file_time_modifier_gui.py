@@ -376,8 +376,14 @@ class FileTimeModifierApp:
                     None
                 )
                 
-                created_win32_time = Time(int(created_time))
-                SetFileTime(handle, created_win32_time, None, None)
+                # 直接从datetime对象创建Windows时间对象，避免使用时间戳
+                if created:
+                    dt = datetime.strptime(created, "%Y-%m-%d %H:%M:%S")
+                    # 创建一个兼容PyInstaller打包环境的Windows时间对象
+                    created_win32_time = Time(dt.year, dt.month, dt.day, 
+                                             dt.hour, dt.minute, dt.second, 0)
+                    SetFileTime(handle, created_win32_time, None, None)
+                
                 CloseHandle(handle)
 
             self.status_var.set(f"成功修改文件时间属性: {file_path}")
