@@ -379,9 +379,23 @@ class FileTimeModifierApp:
                 # 直接从datetime对象创建Windows时间对象，避免使用时间戳
                 if created:
                     dt = datetime.strptime(created, "%Y-%m-%d %H:%M:%S")
-                    # 创建一个兼容PyInstaller打包环境的Windows时间对象
-                    created_win32_time = Time(dt.year, dt.month, dt.day, 
-                                             dt.hour, dt.minute, dt.second, 0)
+                    # 将datetime对象直接传递给Time函数
+                    # 在PyInstaller环境中，Time函数可能只接受一个参数
+                    try:
+                        # 尝试方法1：直接传递datetime对象
+                        created_win32_time = Time(dt)
+                    except TypeError:
+                        try:
+                            # 尝试方法2：使用时间戳（秒）
+                            timestamp = time.mktime(dt.timetuple())
+                            created_win32_time = Time(int(timestamp))
+                        except:
+                            # 尝试方法3：使用特殊格式
+                            # 将datetime转换为UTC时间戳（秒），然后转换为纳秒
+                            timestamp = time.mktime(dt.timetuple())
+                            win32_timestamp = int(timestamp * 10000000) + 116444736000000000
+                            created_win32_time = Time(win32_timestamp)
+                    
                     SetFileTime(handle, created_win32_time, None, None)
                 
                 CloseHandle(handle)
