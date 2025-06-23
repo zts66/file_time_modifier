@@ -13,8 +13,7 @@ jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: write   # 允许创建发布和打 tag
-      releases: write   # 允许上传 release asset
+      contents: read # 兼容性更好的写法（不指定 releases）
 
     steps:
     - name: Checkout code
