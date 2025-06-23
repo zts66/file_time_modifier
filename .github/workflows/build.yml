@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read  # 兼容旧权限模型，避免 releases 报错
+      contents: write  # 修改为 write 权限，允许创建 Release 和上传资产
 
     steps:
     - name: Checkout code
